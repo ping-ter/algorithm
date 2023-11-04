@@ -1,0 +1,188 @@
+{
+  "main": {
+    "id": "61481172f62569fc",
+    "type": "split",
+    "children": [
+      {
+        "id": "7f7709b8e1d6fb3b",
+        "type": "tabs",
+        "dimension": 53.205128205128204,
+        "children": [
+          {
+            "id": "cc908a948859a84d",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {}
+            }
+          },
+          {
+            "id": "195b1d9fa7985e22",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "string/KMP.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ],
+        "currentTab": 1
+      },
+      {
+        "id": "87ff0cb2fbb4e93e",
+        "type": "tabs",
+        "dimension": 46.794871794871796,
+        "children": [
+          {
+            "id": "248592c100519098",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "string/KMP.md",
+                "mode": "preview",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "b9660813e8777dc9",
+    "type": "split",
+    "children": [
+      {
+        "id": "f30e6882c795826a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5785069f8bdc0eb9",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "1146d2609a871f1c",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "tag:#假设",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "bffbceb244dc2fce",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "380b44c120c0d4b6",
+    "type": "split",
+    "children": [
+      {
+        "id": "4dc9fbe353ff7c93",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a57d179d7e5ad3d7",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "string/KMP.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "e504c109797b81c2",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "string/KMP.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "c204dad69f38285a",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "a275aba3df207ee9",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "string/KMP.md"
+              }
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "195b1d9fa7985e22",
+  "lastOpenFiles": [
+    "string/未命名 1.md",
+    "string/KMP.md",
+    "start/1.txt",
+    "start/新建 文本文档.txt",
+    "start",
+    "新建文件夹"
+  ]
+}
