@@ -178,7 +178,7 @@ void inorder(node *nownode)
 
 ![](binary_tree_base_4.png)
 
-中根遍历即先从最左侧的通路自下而上访问,然后
+中根遍历即先从最左侧的通路自下而上访问,然后再对沿途节点访问,并对其右子树执行这个操作
 ```c++
 void binary_tree::inorder()
 {
@@ -226,11 +226,44 @@ void postorder(node *nownode)
 
 #### 无递归版本:
 
+![](binary_tree_base_5.png)
 ```c++
+
+//候补
 
 ```
 
 ### 层序遍历
+
+![](binary_tree_base_6.png)
+逐层从左到右遍历
+相对简单,使用队列辅助即可,访问根节点后将左右子树入队
+
+```c++
+void binary_tree::levelorder()
+{
+    queue<node *> que;
+    que.push(root);
+    node *nownode;
+    while (!que.empty())
+    {
+        nownode = que.front();
+        que.pop();
+        if (nownode != nullptr)
+        {
+            cout << nownode->data << " ";
+            que.push(nownode->leftChild);
+            que.push(nownode->rightChild);
+        }
+    }
+    cout << endl;
+}
+```
+
+遍历结果:
+
+    A B C D E F
+
 
 ## 构建二叉树
 
@@ -298,3 +331,58 @@ struct binary_tree
 
 可以用递归的方式重建二叉树:
 
+```c++
+struct node
+{
+    char data;
+    node *leftChild;
+    node *rightChild;
+    node(char data)
+        : data(data), leftChild(nullptr), rightChild(nullptr) {}
+    //......
+    static node *create(const char *preString, const char *inString, int i, int j, int &p);
+    //这个p是指向前根序列的指针,这里用引用便于遍历过程中不同分支能共享,用指针也可以实现
+};
+
+struct binary_tree
+{
+    node *root;
+    //......
+    binary_tree(const char *preString, const char *inString); // 根据先根序列和中根序列构建二叉树
+};
+
+binary_tree::binary_tree(const char *preString, const char *inString)
+{
+    int p = 0;
+    root = node::create(preString, inString, 0, strlen(inString), p);
+}
+
+node *node::create(const char *preString, const char *inString, int i, int j, int &p)
+{
+    if (i >= j)
+    {
+        return nullptr;
+    }
+    auto find_in = [=]() -> int
+    {
+        for (int m = i; m < j; m++)
+        {
+            if (inString[m] == preString[p])
+            {
+                return m;
+            }
+        }
+        return -1;
+    };//从区域内查找节点
+    int index = find_in();
+    if (index == -1)
+    {
+        return nullptr;//未找到,证明不在这个半区,在另一边
+    }
+    node *nownode = new node(preString[p]);
+    ++p;//只有创建了新节点p指针才进行移动
+    nownode->leftChild = create(preString, inString, i, index, p);
+    nownode->rightChild = create(preString, inString, index + 1, j, p);
+    return nownode;
+}
+```

@@ -1,4 +1,6 @@
 #include <iostream>
+#include <algorithm>
+#include <cstring>
 #include <stack>
 #include <queue>
 using namespace std;
@@ -10,23 +12,20 @@ struct node
     node *rightChild;
     node(char data)
         : data(data), leftChild(nullptr), rightChild(nullptr) {}
-    static node* create()
+    static node *create()
     {
         char data;
         cin >> data;
-        if(data == '0')
+        if (data == '0')
         {
             return 0;
         }
-        node* newnode = new node(data);
+        node *newnode = new node(data);
         newnode->leftChild = create();
         newnode->rightChild = create();
         return newnode;
     }
-    static node* create(char*,char*,char*)
-    {
-        
-    }
+    static node *create(const char *preString, const char *inString, int i, int j, int &p);
 };
 
 struct binary_tree
@@ -36,15 +35,68 @@ struct binary_tree
     void inorder();
     void postorder();
     void preorder2();
+    void levelorder();
     void create()
     {
         root = node::create();
     }
-    binary_tree(){}
-    binary_tree(char*,char*);
+    binary_tree() {}
+    binary_tree(const char *preString, const char *inString); // 根据先根序列和中根序列构建二叉树
 };
 
+binary_tree::binary_tree(const char *preString, const char *inString)
+{
+    int p = 0;
+    root = node::create(preString, inString, 0, strlen(inString), p);
+}
 
+node *node::create(const char *preString, const char *inString, int i, int j, int &p)
+{
+    if (i >= j)
+    {
+        return nullptr;
+    }
+    auto find_in = [=]() -> int
+    {
+        for (int m = i; m < j; m++)
+        {
+            if (inString[m] == preString[p])
+            {
+                return m;
+            }
+        }
+        return -1;
+    }; // 从区域内查找节点
+    int index = find_in();
+    if (index == -1)
+    {
+        return nullptr; // 未找到,证明不在这个半区,在另一边
+    }
+    node *nownode = new node(preString[p]);
+    ++p; // 只有创建了新节点p指针才进行移动
+    nownode->leftChild = create(preString, inString, i, index, p);
+    nownode->rightChild = create(preString, inString, index + 1, j, p);
+    return nownode;
+}
+
+void binary_tree::levelorder()
+{
+    queue<node *> que;
+    que.push(root);
+    node *nownode;
+    while (!que.empty())
+    {
+        nownode = que.front();
+        que.pop();
+        if (nownode != nullptr)
+        {
+            cout << nownode->data << " ";
+            que.push(nownode->leftChild);
+            que.push(nownode->rightChild);
+        }
+    }
+    cout << endl;
+}
 void binary_tree::preorder()
 {
     stack<node *> sta;
@@ -125,7 +177,9 @@ void binary_tree::inorder()
         nownode = nownode->rightChild; // 访问一个节点后,访问其右子树
     }
 }
-
+void binary_tree::postorder()
+{
+}
 void postorder(node *nownode)
 {
     if (nownode == nullptr)
@@ -139,7 +193,7 @@ void postorder(node *nownode)
 
 int main()
 {
-    binary_tree tree;
+    /* binary_tree tree;
     tree.root = new node('A');
 
     tree.root->leftChild = new node('B');
@@ -150,12 +204,8 @@ int main()
     tree.root->leftChild->rightChild->leftChild = new node('D');
 
     tree.root->rightChild->leftChild = new node('F');
-
-    // inorder(tree.root);
-    tree.inorder();
-
-    tree.create();
-    tree.preorder();
-    tree.inorder();
+ */
+    binary_tree tree("ABDECF", "DBEACF");
+    tree.levelorder();
     return 0;
 }
