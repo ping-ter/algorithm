@@ -5,7 +5,7 @@
 ### 顺序存储
 二叉树的结构可以天然对应顺序存储
 
-![](binary_tree_base_1.png)
+![](files/binary_tree_base_1.png)
 
 对于图示的二叉树,可以对应成:
 
@@ -35,7 +35,7 @@ struct node
 ## 遍历
 
 接下来使用不同遍历方式来遍历如图二叉树
-![](binary_tree_base_2.png)
+![](files/binary_tree_base_2.png)
 
 先构建这个二叉树:
 ```c++
@@ -126,7 +126,7 @@ void binary_tree::preorder()
 ```
 
 此外,可以思考:
-![](binary_tree_base_3.png)
+![](files/binary_tree_base_3.png)
 
 如图,前序遍历总是先遍历依次遍历左子树,到叶子节点之后再遍历其父节点的右子树,因此可以设计算法:
 
@@ -176,7 +176,7 @@ void inorder(node *nownode)
 
 #### 无递归版本:
 
-![](binary_tree_base_4.png)
+![](files/binary_tree_base_4.png)
 
 中根遍历即先从最左侧的通路自下而上访问,然后再对沿途节点访问,并对其右子树执行这个操作
 ```c++
@@ -226,7 +226,7 @@ void postorder(node *nownode)
 
 #### 无递归版本:
 
-![](binary_tree_base_5.png)
+![](files/binary_tree_base_5.png)
 ```c++
 
 //候补
@@ -235,7 +235,7 @@ void postorder(node *nownode)
 
 ### 层序遍历
 
-![](binary_tree_base_6.png)
+![](files/binary_tree_base_6.png)
 逐层从左到右遍历
 相对简单,使用队列辅助即可,访问根节点后将左右子树入队
 
@@ -269,7 +269,8 @@ void binary_tree::levelorder()
 
 ### 含有空节点标识的先根序列构建
 
-可以直接递归构建
+
+#### 递归构建
 ```c++
 struct node
 {
@@ -306,6 +307,9 @@ struct binary_tree
     }
 };
 ```
+#### 非递归版本
+
+类似前序遍历的非递归版本
 
 
 ### 根据先\后根序列和中根序列重建二叉树
