@@ -7,7 +7,7 @@ using namespace std;
 class Solution
 {
 public:
-    int findCircleNum(const vector<vector<int>>& isConnected)
+    int findCircleNum(const vector<vector<int>> &isConnected)
     {
         struct union_find
         {
@@ -74,9 +74,9 @@ public:
         {
             for (int j = 0; j < i; j++)
             {
-                if(isConnected[i][j] == 1)
+                if (isConnected[i][j] == 1)
                 {
-                    myset.union_set(i + 1 ,j + 1);
+                    myset.union_set(i + 1, j + 1);
                 }
             }
         }
@@ -84,11 +84,11 @@ public:
     }
 };
 
-
 int main()
 {
     Solution a;
-    auto b = vector<vector<int>>({vector<int>({1,1,1}),vector<int>({1,1,1}),vector<int>({1,1,1})});
+    auto b = vector<vector<int>>({vector<int>({1, 1, 1}), vector<int>({1, 1, 1}), vector<int>({1, 1, 1})});
     cout << a.findCircleNum(b);
     return 0;
 }
+

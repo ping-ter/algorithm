@@ -52,7 +52,56 @@ namespace Mat_graph
         void BFS()
         {
             queue<int> que;
-            vector<int> v_travelsaled(nodes.size(), 0);
+            int n = nodes.size();
+            vector<int> v_travelsaled(n, 0);
+
+            que.push(0);
+            while (!que.empty())
+            {
+                int index = que.front();
+                que.pop();
+                if (v_travelsaled[index] == 1)
+                {
+                    continue;
+                }
+                v_travelsaled[index] = 1;
+                cout << nodes[index].data << " ";
+                for (int i = 0; i < n; i++) // 对于无向图,这里可以优化
+                {
+                    if (adjMat[index][i] != 0 && v_travelsaled[i] == 0)
+                    {
+                        que.push(i);
+                    }
+                }
+            }
+            cout << endl;
+        }
+
+        void DFS()
+        {
+            stack<int> sta;
+            int n = nodes.size();
+            vector<int> v_traversaled(n, 0);
+            sta.push(0);
+            while (!sta.empty())
+            {
+                int index = sta.top();
+                sta.pop();
+                if (v_traversaled[index] == 1)
+                {
+                    continue;
+                }
+                v_traversaled[index] = 1;
+                cout << nodes[index].data << " ";
+                for (int i = 0; i < n; i++)
+                {
+                    if (adjMat[index][i] != 0 && v_traversaled[i] == 0)
+                    {
+                        sta.push(i);
+                    }
+                }
+            }
+            cout << endl;
         }
     };
 
@@ -185,7 +234,7 @@ namespace List_graph
 
 int main()
 {
-    using namespace List_graph;
+    using namespace Mat_graph;
     graph myfirst_graph(6, {'A', 'B', 'C', 'D', 'E', 'F'}, false);
     myfirst_graph.addEdge(0, 1);
     myfirst_graph.addEdge(0, 2);
@@ -196,7 +245,6 @@ int main()
     myfirst_graph.addEdge(5, 4);
     myfirst_graph.addEdge(5, 3);
     myfirst_graph.print();
-    myfirst_graph.DFS_noRecursion();
+    myfirst_graph.DFS();
     return 0;
 }
-
