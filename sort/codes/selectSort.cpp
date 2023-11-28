@@ -20,47 +20,45 @@ void selectSort(vector<int> &datas)
     }
 }
 
-void siftDown(vector<int> &datas, int root, int n) // 重建堆
+void siftDown(vector<int> &datas, int root, int n) // 向下重建堆
 {
     int lchild = root * 2 + 1;
-    int rchild = root * 2 + 2;
+    int rchild;
+    int max; // 最大的子树
     while (lchild < n)
     {
-        int max = root;
-        if (datas[lchild] > datas[max])
-        {
-            max = lchild;
-        }
-        if (rchild < n && datas[rchild] > datas[max])
+        rchild = lchild + 1;
+        if (rchild < n && datas[rchild] > datas[lchild])
         {
             max = rchild;
         }
-        if (max == root)
+        else
         {
-            return;
+            max = lchild;
         }
-        swap(datas[max], datas[root]);
+
+        if (datas[max] <= datas[root])
+        {
+            return; // 根比左子树大,已经重建完成
+        }
+
+        swap(datas[max], datas[root]); // 交换根节点和最大子树
         root = max;
         lchild = root * 2 + 1;
-        rchild = root * 2 + 2;
-    }
-}
-void heapSort(vector<int> &datas)
-{
-    int n = datas.size();
-    for (int i = 0; i < n / 2; i++)
-    {
-        siftDown(datas, i, n);
     }
 }
 
-int main()//debug
+void heapSort(vector<int> &datas)
 {
-    vector<int> arr = {2,3,8,3,42,1,3,5};
-    heapSort(arr);
-    for_each(arr.begin(),arr.end(),[](int a)
+    int n = datas.size();
+    for (int i = n - 1; i >= 0; i--) // 从最后一个元素开始,完成堆化
     {
-        cout << a << " ";
-    });
-    return 0;
+        siftDown(datas, i, n);
+    }
+
+    for (int i = n - 1; i > 0; i--) // 堆排序过程
+    {
+        swap(datas[i], datas[0]); // 出堆,把最大的元素放到末尾
+        siftDown(datas, 0, i);    // 维护堆结构
+    }
 }

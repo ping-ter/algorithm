@@ -34,7 +34,7 @@ int main()
 {
     print();
     cout << endl;
-    bubbleSort(toSort);
+    heapSort(toSort);
     print();
     judge();
     return 0;
