@@ -114,13 +114,13 @@ void quickSort(vector<int> &datas)
 
 ```c++
 
-void insertSort(vector<int> &datas, int l, int r)//插入排序
+void insertSort(vector<int> &datas, int l, int r)
 {
     for (int i = l + 1; i <= r; i++)
     {
         int temp = datas[i];
         int j = i - 1;
-        while (datas[j] > temp && j >= l)
+        while (j >= l && datas[j] > temp) // 要先判断j是否越界,否则datas[j抛出异常]
         {
             datas[j + 1] = datas[j];
             j--;
@@ -171,3 +171,134 @@ void quickSortThreeWays(vector<int> &datas)
 
 ```
 
+### 内省排序
+
+当递归深度过高,而序列仍比较长时,快速排序会退化到`O(n^2)`
+
+而内省排序限制了递归深度,用堆排序优化快排
+
++ 如果长度小一定值,则对序列进行`插入排序`
++ 如果递归深度超过`log n`(向下取整),对序列进行`堆排序`
+
+std::sort就是采用内省排序实现的
+
+stl源码如下:
+
+```c++
+template <class _RanIt, class _Pr>
+_CONSTEXPR20 void _Sort_unchecked(_RanIt _First, _RanIt _Last, _Iter_diff_t<_RanIt> _Ideal, _Pr _Pred) {
+    // order [_First, _Last)
+    for (;;) {
+        if (_Last - _First <= _ISORT_MAX) { // small
+            _Insertion_sort_unchecked(_First, _Last, _Pred);
+            return;
+        }
+        // 对较短的序列采用插入排序
+
+        if (_Ideal <= 0) { // heap sort if too many divisions
+            _Make_heap_unchecked(_First, _Last, _Pred);
+            _Sort_heap_unchecked(_First, _Last, _Pred);
+            return;
+        }
+
+        // 递归深度较高时采用堆排序
+
+        // divide and conquer by quicksort
+        auto _Mid = _Partition_by_median_guess_unchecked(_First, _Last, _Pred);
+
+        _Ideal = (_Ideal >> 1) + (_Ideal >> 2); // allow 1.5 log2(N) divisions
+        // 限制在 1.5log2(N)
+        if (_Mid.first - _First < _Last - _Mid.second) { // loop on second half
+            _Sort_unchecked(_First, _Mid.first, _Ideal, _Pred);
+            _First = _Mid.second;
+        } else { // loop on first half
+            _Sort_unchecked(_Mid.second, _Last, _Ideal, _Pred);
+            _Last = _Mid.first;
+        }
+    }
+}
+```
+
+自己实现的内省排序:
+
+```c++
+void heapfy(vector<int> &datas, int l, int r, int root)
+{
+    int child = l + (root - l) * 2 + 1;
+    while (child <= r)
+    {
+        if (child + 1 <= r && datas[child + 1] > datas[child])
+        {
+            child++;
+        }
+
+        if (datas[child] <= datas[root])
+        {
+            return;
+        }
+
+        swap(datas[child], datas[root]);
+        root = child;
+        int child = l + (root - l) * 2 + 1;
+    }
+}
+
+void heapSort(vector<int> &datas, int l, int r)
+{
+    for (int i = r; i >= l; i--)
+    {
+        heapfy(datas, l, r, i);
+    }
+
+    for (int i = r; i >= l; i--)
+    {
+        swap(datas[l], datas[i]);
+        heapfy(datas, l, r, 0);
+    }
+}
+void introSortInner(vector<int> &datas, int l, int r, int Ideal)
+{
+    if (r - l < 15)
+    {
+        insertSort(datas, l, r);
+        return;
+    }
+
+    if (Ideal <= 0)
+    {
+        heapSort(datas, l, r);
+    }
+    int mid = datas[rand() % (r - l + 1) + l];
+    int i = l;
+    int lt = l;
+    int gt = r;
+    Ideal = (Ideal >> 1) + (Ideal >> 2); // 限制递归深度
+
+    while (i <= gt)
+    {
+        if (datas[i] < mid)
+        {
+            swap(datas[i], datas[lt]);
+            i++;
+            lt++;
+        }
+        else if (datas[i] == mid)
+        {
+            i++;
+        }
+        else
+        {
+            swap(datas[i], datas[gt]);
+            gt--;
+        }
+    }
+    introSortInner(datas, l, lt - 1, Ideal);
+    introSortInner(datas, gt + 1, r, Ideal);
+}
+
+void introSort(vector<int> &datas)
+{
+    introSortInner(datas, 0, datas.size() - 1, datas.size());
+}
+
+```
