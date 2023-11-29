@@ -20,6 +20,23 @@ void insertSort(vector<int> &datas)
         datas[j + 1] = temp;
     }
 }
+
+void insertSort2(vector<int> &datas)//另一种写法
+{
+    int n = datas.size();
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < i; j++)
+        {
+            if (datas[i] < datas[j])
+            {
+                int temp = datas[i];
+                datas[i] = datas[j];
+                datas[j] = temp;
+            }
+        }
+    }
+}
 ```
 
 由于数组不能直接插入,元素需要移动,复杂度为`O(N^2)`

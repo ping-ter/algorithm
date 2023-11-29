@@ -22,6 +22,23 @@ void insertSort(vector<int> &datas)
     }
 }
 
+void insertSort2(vector<int> &datas)//另一种写法
+{
+    int n = datas.size();
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < i; j++)
+        {
+            if (datas[i] < datas[j])
+            {
+                int temp = datas[i];
+                datas[i] = datas[j];
+                datas[j] = temp;
+            }
+        }
+    }
+}
+
 void binary_insertSort(vector<int> &datas)
 {
     int n = datas.size();

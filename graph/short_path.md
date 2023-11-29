@@ -175,3 +175,12 @@ void graph::shortPath(int index)
 
 #### 算法优化
 
+可以用优先队列来优化
+
+用斐波纳契堆优化效果最佳,但不易实现
+
+
+## 权图
+
+### Bellman Ford算法
+
