@@ -1,6 +1,8 @@
 # 拓扑排序&关键路径
 
-## 前置知识
+## 拓扑排序
+
+### 用途
 
 + 有时一个任务可以拆分成若干个子任务
 + 子任务间存在一些先后关系,必须完成前置任务,才能进行当前任务
@@ -30,9 +32,9 @@
 
 如果得不到拓扑序列,则该AOV网不合法,存在环,无法完成任务
 
-## 拓扑排序的算法实现
+### 算法实现
 
-### 拓扑序
+#### 拓扑序
 拓扑排序算法过程如下:
 
 1. 从图中选择一个入度为0的点,加入拓扑序列
@@ -88,7 +90,7 @@
 
 输出的是合法的拓扑排序
 
-### 逆拓扑序
+#### 逆拓扑序
 
 特殊地,深度优先遍历可以生成逆拓扑序
 对于i->j,深度优先遍历可以保证先遍历到j再遍历i,类似二叉树后序遍历
@@ -120,11 +122,16 @@
     D H E F B C A
 
 
-## 关键路径的概念
+## 关键路径
 
-AOV网可以加权,表示活动所需的时间
+### AOE网
 
-AOV网中有些活动可以并行,有些必须顺序进行
+![](./files/cirtical_path.png)
+
+
+
+`AOE网(Activity On Edges)`:**有向边**表示活动或者任务,`边上的权值`表示`活动时间`;**顶点**表示事件,代表入边的活动已经完成,而出边的活动可以开始
+
 
 **源点**表示开始(入度为0)
 
@@ -136,21 +143,206 @@ AOV网中有些活动可以并行,有些必须顺序进行
 
 关键路径上的活动成为`关键活动`
 
-## 求关键路径
-
-![](./files/cirtical_path.png)
-
-AOV网中,**边**表示`活动`,**边的权值**表示`活动持续时间`,**顶点**表示`事件`
-
-与关键活动有关的量:
+### 与关键活动有关的量:
 
 1. 事件v[j]的最早发生时间ve[j]
 2. 事件v[j]的最迟发生时间vl[j]
 3. 活动a[i]的最早开始事件e[i]
 4. 活动a[i]的最早开始事件l[i]
 
-### 事件v[j]的最早发生时间ve[j]
+#### 事件v[j]的最早发生时间ve[j]
 
 + 对于源点,`ve[source] = 0`
-+ 对于其它点i,如果有多条边(m1 -> i)汇入,
++ 对于其它点i,如果有多条边(m1 -> i,m2 -> i ...)汇入,那么
 
+    ve[j] = max(weight(m1,i) + ve[m1],weight(m2,i) + ve[m2],...)
+
+由这个式子可以递推出各事件最早发生时间
+
+#### 事件v[j]的最迟发生时间vl[j]
+
+在不推迟工期(汇点的最早发生时间不推迟)的前提下,事件v[j]允许的最迟的开始时间,等于ve[n] - v[j]到v[n]的最长路径长度,v[n]为汇点
+
+
++ vl[n] = ve[n]
++ vl[j] = min{vl[k] - weight(j,k)},j != n, k是j后继事件
+
+#### 活动a[i]的最早开始事件e[i]
+
+a[i] = `<j,k>`,则`e[i] = ve[j]`
+
+#### 活动a[i]的最早开始事件l[i]
+
+不引起时间延误的前提下,活动a[i]允许的最迟开始时间,如果a[i] = `<j,k>`,则:
+
+    l[i] = vl[k] - weight(j,k)
+
+
+
+### 关键活动
+
+关键路径上的关键活动,满足活动的最早开始时间等于最迟开始时间,即:
+
+    e[i] = l[i]
+
+
+求关键活动思路如下
+
+1. 对AOE网进行拓扑排序
+2. 由拓扑序求出各顶点v[j]的ve[j]
+3. 由逆拓扑序求出各顶点v[j]的vl[j]
+4. 根据ve[j]和vl[j]算出各活动a[i]的e[i]和l[i],如果有`e[i] == l[i]`,那么这个活动是关键活动
+
+### 算法实现
+
+```c++
+struct AOE : public graph
+{
+    list<int> topolist;
+    vector<int> ve;
+    vector<int> vl;
+    int n;
+    AOE(int nodes_count, const vector<node> &nodes)
+        : graph(nodes_count, nodes, true), ve(nodes_count, 0), vl(nodes_count), n(nodes_count) {}
+    AOE(int nodes_count)
+        : graph(nodes_count, true), ve(nodes_count, 0), vl(nodes_count), n(nodes_count) {}
+    void addEdge(int i, int j, int weight) // 权图
+    {
+        nodes[i].link.push_back(linknode(j, weight));
+        if (!direct)
+        {
+            nodes[j].link.push_back(linknode(i, weight));
+        }
+    }
+    virtual void topoOrder() // 拓扑排序
+    {
+        topolist.clear();
+        int n = nodes.size();
+        vector<int> inDegree(n, 0); // 记录各点入度
+        stack<int> sta;             // 辅助栈
+        for_each(nodes.begin(), nodes.end(), [&](node &now)
+                 {
+            for(linknode& i : now.link)
+            {
+                inDegree[i.index]++;
+            } }); // 统计各点入度
+
+        for (int i = 0; i < n; i++)
+        {
+            if (inDegree[i] == 0)
+            {
+                sta.push(i); // 入度为0的点入栈
+            }
+        }
+
+        while (!sta.empty())
+        {
+            int index = sta.top();
+            sta.pop();
+            topolist.push_back(index);
+
+            for (linknode &i : nodes[index].link)
+            {
+                inDegree[i.index]--; // 减少入度,模拟删除边的操作
+                if (inDegree[i.index] == 0)
+                {
+                    sta.push(i.index); // 入度为0的点入栈
+                }
+            }
+        }
+        cout << endl;
+    }
+
+    void vertexEarliestTime() // 求ve
+    {
+        for (int &i : topolist)
+        {
+            for (linknode &j : nodes[i].link)
+            {
+                if (ve[j.index] < ve[i] + j.weight)
+                {
+                    ve[j.index] = ve[i] + j.weight;
+                }
+            }
+        }
+    }
+
+    void vertexLastTime() // 求vl
+    {
+        for (int i = 0; i < n; i++)
+        {
+            vl[i] = ve[n - 1];
+        }
+        for_each(topolist.rbegin(), topolist.rend(), [&](int i)
+                 {
+                     for (linknode &j : nodes[i].link)
+                     {
+                         if (vl[i] > vl[j.index] - j.weight)
+                         {
+                             vl[i] = vl[j.index] - j.weight;
+                         }
+                     } });
+    }
+    void CriticalPath()
+    {
+        topoOrder();
+        vertexEarliestTime();
+        vertexLastTime();
+
+        for (int i : ve)
+        {
+            cout << i << " ";
+        }
+        cout << "\n";
+
+        for (int i : vl)
+        {
+            cout << i << " ";
+        }
+        cout << "\n";
+
+        list<pair<int, int>> criticalPath;
+        for (int i : topolist)
+        {
+            for (linknode j : nodes[i].link)
+            {
+                if (ve[i] == vl[j.index] - j.weight)
+                {
+                    criticalPath.push_back(make_pair(i, j.index));
+                }
+            }
+        }
+        for_each(criticalPath.begin(), criticalPath.end(), [](pair<int, int> &a)
+                 { cout << a.first << "->" << a.second << " "; });
+    }
+};
+
+int main()
+{
+    AOE critical(9);
+    critical.addEdge(0, 1, 6);
+    critical.addEdge(0, 2, 4);
+    critical.addEdge(0, 3, 5);
+
+    critical.addEdge(1, 4, 1);
+    critical.addEdge(2, 4, 1);
+    critical.addEdge(3, 5, 2);
+
+    critical.addEdge(4, 6, 9);
+    critical.addEdge(4, 7, 7);
+    critical.addEdge(5, 7, 4);
+
+    critical.addEdge(6, 8, 2);
+    critical.addEdge(7, 8, 4);
+
+    critical.CriticalPath();
+
+    return 0;
+}
+```
+
+结果如下:
+
+    0 6 4 5 7 7 16 14 18
+    0 6 6 8 7 10 16 14 18
+    0->1 1->4 4->6 4->7 7->8 6->8
