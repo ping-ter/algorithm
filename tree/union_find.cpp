@@ -1,33 +1,31 @@
 #include <iostream>
-#include <array>
+#include <vector>
 #include <string>
 #include <stack>
 using namespace std;
 struct union_find
 {
-    array<char, 256> father;
-    array<int, 256> rank;
+    vector<int> father;
+    vector<int> rank;
+    int sets_count;
     // 节点的父亲数组
-    union_find()
-    {
-        fill(father.begin(), father.end(), 0); // 初始化成0
-        fill(rank.begin(), rank.end(), 0);     // 初始化成0
-    }
-    void make_set(char x);
-    void union_set(char x, char y);
-    char find_set(char x);
+    union_find(int size)
+        : father(size, 0), rank(size, 0), sets_count(size) {}
+    void make_set(int x);
+    void union_set(int x, int y);
+    int find_set(int x);
 };
 
-void union_find::make_set(char x)
+void union_find::make_set(int x)
 {
     father[x] = 0; // 为x构建一个单节点的树
     rank[x] = 0;
 }
 
-char union_find::find_set(char x)
+int union_find::find_set(int x)
 {
-    char p = x;
-    stack<char> sta;
+    int p = x;
+    stack<int> sta;
     while (father[p] != 0)
     {
         sta.push(p);
@@ -41,7 +39,7 @@ char union_find::find_set(char x)
     return p;
 }
 
-void union_find::union_set(char x, char y)
+void union_find::union_set(int x, int y)
 {
     // father[find_set(x)] = find_set(y);
     char fx = find_set(x), fy = find_set(y);
@@ -49,6 +47,7 @@ void union_find::union_set(char x, char y)
     {
         return; // 已经在同一集合了,不合并
     }
+    sets_count--;
     if (rank[fx] > rank[fy])
     {
         father[fy] = fx; // 树高没增加,秩不变
@@ -63,6 +62,7 @@ void union_find::union_set(char x, char y)
     }
 }
 
+/*
 int main()
 {
     union_find aset;
@@ -83,3 +83,4 @@ int main()
     }
     return 0;
 }
+*/
