@@ -177,7 +177,150 @@ void graph::shortPath(int index)
 
 可以用优先队列来优化
 
+对于findMin函数,可以用堆来代替,堆中储存点和其最小权值
+
+1. 开始时将{起点,0}和入堆
+2. 每次循环时将堆顶元素出堆,进行操作(代替findMin)
+3. 更新权值后,将{更新点,新权值}入堆
+
+这里需要用到优先队列,优先队列可以自定义比较函数,这里用仿函数填模版:
+
+```c++
+struct Compare
+{//仿函数,定义比较方式
+    bool operator()(const pair<int, int> &a, const pair<int, int> &b)
+    {
+        return a.second > b.second;
+    }
+};
+priority_queue<pair<int, int>, vector<pair<int, int>>, Compare> que;
+```
+
+代码实现:
+
+```c++
+    void graph::Dijkstra_pro(int index)
+    {
+        int n = nodes.size();
+        const int INF = 0x3f3f3f3f;
+        vector<int> dist(n, INF);
+        vector<int> pre(n, -1);
+        vector<int> S(n, 0);
+        dist[index] = 0;
+
+        typedef pair<int, int> vw; // 点和权值
+        struct Compare
+        {
+            bool operator()(const vw &a, const vw &b)
+            {
+                return a.second > b.second;
+            }
+        };
+        priority_queue<vw, vector<vw>, Compare> que;
+        que.push({index, 0});
+
+        while (!que.empty())
+        {
+            vw now_vw = que.top();
+            que.pop();
+            int now = now_vw.first;
+            if (S[now] == 1)
+            {
+                continue; // 已经加入S了
+            }
+            if (now_vw.second == INF)
+            {
+                break; // 图不连通,剩下的点源点都不可及,结束算法
+            }
+            S[now] = 1;
+            for_each(nodes[now].link.begin(), nodes[now].link.end(), [&](linknode &a)
+                     {
+                if(S[a.index] == 0 && dist[now] + a.weight < dist[a.index])
+                {
+                    dist[a.index] = dist[now] + a.weight;
+                    pre[a.index] = now;
+                    que.push({a.index,dist[a.index]}); // 入堆
+                } });
+        }
+    }
+```
+
 用斐波纳契堆优化效果最佳,但不易实现
+
+
+#### 求所有最短路径
+
+最短路径未必只有一条,有时需要求出所有的最短路径
+
+无论如何,之前的定理依然适用
+
+    对于ab间的最短路径,路径上的任意两点v1 v2间一定也是最短距离
+
+因此,可以把pre改成表,更新路径时,如果得到最短距离与已知的相等,可以将新的路径添加到pre
+
+代码如下:
+
+```c++
+    void graph::Dijkstra_many(int start)
+    {
+        int n = nodes.size();
+        const int INF = 0x3f3f3f3f;
+        vector<int> dist(n, INF);
+        vector<list<int>> pre(n); // 储存前置节点
+        vector<int> S(n, 0);
+        dist[start] = 0;
+
+        typedef pair<int, int> vw; // 点和权值
+        struct Compare
+        {
+            bool operator()(const vw &a, const vw &b)
+            {
+                return a.second > b.second;
+            }
+        };
+        priority_queue<vw, vector<vw>, Compare> que;
+        que.push({start, 0});
+
+        while (!que.empty())
+        {
+            vw now_vw = que.top();
+            que.pop();
+            int now = now_vw.first;
+            if (S[now] == 1)
+            {
+                continue; // 已经加入S了
+            }
+            if (now_vw.second == INF)
+            {
+                break; // 图不连通,剩下的点源点都不可及,结束算法
+            }
+            S[now] = 1;
+            for_each(nodes[now].link.begin(), nodes[now].link.end(), [&](linknode &a)
+                     {
+                if(S[a.index] == 0 && dist[now] + a.weight < dist[a.index])
+                {
+                    dist[a.index] = dist[now] + a.weight;
+                    pre[a.index].clear();
+                    pre[a.index].push_back(now);
+                    que.push({a.index,dist[a.index]}); // 入堆
+                }
+                else if(dist[now] + a.weight == dist[a.index])
+                {
+                    pre[a.index].push_back(now);
+                } });
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            cout << i << ": ";
+            for (int p : pre[i])
+            {
+                cout << p << " ";
+            }
+            cout << endl;
+        }
+    }
+```
 
 
 ## 权图

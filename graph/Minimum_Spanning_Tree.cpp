@@ -58,6 +58,7 @@ struct graph
         }
     }
     int Prim(int start);
+    int Prim_pro(int start);
     int Kruskal();
 };
 
@@ -139,6 +140,58 @@ int graph::Prim(int start)
     return sumWeight;
 }
 
+int graph::Prim_pro(int start)
+{
+    int INF = 0x3f3f3f3f;
+    vector<int> lowcost(nodes_size, INF);
+    vector<int> pre(nodes_size, -1);
+    vector<int> S(nodes_size, 0);
+    int sumWeight = 0; // 累计加权
+    lowcost[start] = 0;
+    struct Compare
+    {
+        bool operator()(const pair<int, int> &a, const pair<int, int> &b)
+        {
+            return a.second > b.second;
+        }
+    };
+    priority_queue<pair<int, int>, vector<pair<int, int>>, Compare> que;
+
+    que.push({start, 0});
+    while (!que.empty())
+    {
+        pair<int, int> now_pair = que.top();
+        que.pop();
+        int now = now_pair.first;
+
+        if (S[now] == 1)
+        {
+            continue;
+        }
+        if (lowcost[now] == INF)
+        {
+            return sumWeight; // 结束
+        }
+
+        S[now] = 1;
+        sumWeight += lowcost[now];
+        if (now != start)
+        {
+            cout << pre[now] << "-" << now << "\n"; // 输出最小支撑树里的边
+        }
+        for (linknode &a : nodes[now].link)
+        {
+            if (S[a.index] == 0 && lowcost[a.index] > a.weight)
+            {
+                lowcost[a.index] = a.weight;
+                pre[a.index] = now;
+                que.push({a.index, a.weight});
+            }
+        }
+    }
+    return sumWeight;
+}
+
 int main()
 {
     freopen("../files/MSTtestdata.in", "r", stdin);
@@ -152,7 +205,7 @@ int main()
         gra.addEdge(a, b, w);
     }
     // gra.print();
-    cout << gra.Kruskal() << "\n";
+    cout << gra.Prim_pro(0) << "\n";
 
     return 0;
 }

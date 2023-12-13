@@ -231,8 +231,130 @@ namespace List_graph
             cout << endl;
         }
         void Dijkstra(int index);
-        void Dijkstra_better(int index);
+        void Dijkstra_pro(int index);
+        void Dijkstra_many(int start);
     };
+    void graph::Dijkstra_pro(int index)
+    {
+        int n = nodes.size();
+        const int INF = 0x3f3f3f3f;
+        vector<int> dist(n, INF);
+        vector<int> pre(n, -1);
+        vector<int> S(n, 0);
+        dist[index] = 0;
+
+        typedef pair<int, int> vw; // 点和权值
+        struct Compare
+        {
+            bool operator()(const vw &a, const vw &b)
+            {
+                return a.second > b.second;
+            }
+        };
+        priority_queue<vw, vector<vw>, Compare> que;
+        que.push({index, 0});
+
+        while (!que.empty())
+        {
+            vw now_vw = que.top();
+            que.pop();
+            int now = now_vw.first;
+            if (S[now] == 1)
+            {
+                continue; // 已经加入S了
+            }
+            if (now_vw.second == INF)
+            {
+                break; // 图不连通,剩下的点源点都不可及,结束算法
+            }
+            S[now] = 1;
+            for_each(nodes[now].link.begin(), nodes[now].link.end(), [&](linknode &a)
+                     {
+                if(S[a.index] == 0 && dist[now] + a.weight < dist[a.index])
+                {
+                    dist[a.index] = dist[now] + a.weight;
+                    pre[a.index] = now;
+                    que.push({a.index,dist[a.index]}); // 入堆
+                } });
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            stack<int> path;
+            int p = i;
+            while (p != -1)
+            {
+                path.push(p);
+                p = pre[p];
+            }
+
+            while (!path.empty())
+            {
+                cout << path.top() << "->";
+                path.pop();
+            }
+            cout << endl;
+        }
+    }
+    void graph::Dijkstra_many(int start)
+    {
+        int n = nodes.size();
+        const int INF = 0x3f3f3f3f;
+        vector<int> dist(n, INF);
+        vector<list<int>> pre(n); // 储存前置节点
+        vector<int> S(n, 0);
+        dist[start] = 0;
+
+        typedef pair<int, int> vw; // 点和权值
+        struct Compare
+        {
+            bool operator()(const vw &a, const vw &b)
+            {
+                return a.second > b.second;
+            }
+        };
+        priority_queue<vw, vector<vw>, Compare> que;
+        que.push({start, 0});
+
+        while (!que.empty())
+        {
+            vw now_vw = que.top();
+            que.pop();
+            int now = now_vw.first;
+            if (S[now] == 1)
+            {
+                continue; // 已经加入S了
+            }
+            if (now_vw.second == INF)
+            {
+                break; // 图不连通,剩下的点源点都不可及,结束算法
+            }
+            S[now] = 1;
+            for_each(nodes[now].link.begin(), nodes[now].link.end(), [&](linknode &a)
+                     {
+                if(S[a.index] == 0 && dist[now] + a.weight < dist[a.index])
+                {
+                    dist[a.index] = dist[now] + a.weight;
+                    pre[a.index].clear();
+                    pre[a.index].push_back(now);
+                    que.push({a.index,dist[a.index]}); // 入堆
+                }
+                else if(dist[now] + a.weight == dist[a.index])
+                {
+                    pre[a.index].push_back(now);
+                } });
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            cout << i << ": ";
+            for (int p : pre[i])
+            {
+                cout << p << " ";
+            }
+            cout << endl;
+        }
+    }
     void graph::Dijkstra(int index)
     {
         int n = nodes.size();
@@ -316,22 +438,56 @@ namespace List_graph
                 } }); // 只需要更新邻接的点
             check();
         }
+
+        for (int i = 0; i < n; i++)
+        {
+            stack<int> path;
+            int p = i;
+            while (p != -1)
+            {
+                path.push(p);
+                p = pre[p];
+            }
+
+            while (!path.empty())
+            {
+                cout << path.top() << "->";
+                path.pop();
+            }
+            cout << endl;
+        }
     }
 };
 
 int main()
 {
     using namespace List_graph;
-    graph myfirst_graph(5, {'1', '2', '3', '4', '5'}, true);
-    myfirst_graph.addEdge(0, 1, 3);
-    myfirst_graph.addEdge(0, 4, 30);
-    myfirst_graph.addEdge(1, 2, 25);
-    myfirst_graph.addEdge(1, 3, 8);
-    myfirst_graph.addEdge(2, 4, 10);
-    myfirst_graph.addEdge(3, 2, 4);
-    myfirst_graph.addEdge(3, 4, 12);
+    graph myfirst_graph(5, {'1', '2', '3', '4', '5'}, false);
+    // myfirst_graph.addEdge(0, 1, 3);
+    // myfirst_graph.addEdge(0, 4, 30);
+    // myfirst_graph.addEdge(1, 2, 25);
+    // myfirst_graph.addEdge(1, 3, 8);
+    // myfirst_graph.addEdge(2, 4, 10);
+    // myfirst_graph.addEdge(3, 2, 4);
+    // myfirst_graph.addEdge(3, 4, 12);
+    myfirst_graph.addEdge(0, 1, 1);
+    myfirst_graph.addEdge(0, 2, 2);
+    myfirst_graph.addEdge(0, 3, 3);
+    myfirst_graph.addEdge(1, 3, 2);
+    myfirst_graph.addEdge(2, 3, 1);
+    myfirst_graph.addEdge(3, 4, 2);
+    /*
+    'A': [('B', 1), ('C', 2),('D', 3)],
+    'B': [('D', 2)],
+    'C': [('D', 1)],
+    'D': [('E', 2)],
+    'E': []
+    */
+    // myfirst_graph.print();
 
-    myfirst_graph.print();
-    myfirst_graph.Dijkstra(0);
+    for (int i = 0; i < 5; i++)
+    {
+        myfirst_graph.Dijkstra_many(i);
+    }
     return 0;
 }

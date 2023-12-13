@@ -108,6 +108,65 @@ out:
 2-1
 11
 ```
+### Prim算法优化
+
+类似Dijkstra算法,可以用堆优化
+
+利用小根堆,一开始,将起点入堆,然后更新距离时将被更新的点入堆
+
+```c++
+int graph::Prim_pro(int start)
+{
+    int INF = 0x3f3f3f3f;
+    vector<int> lowcost(nodes_size, INF);
+    vector<int> pre(nodes_size, -1);
+    vector<int> S(nodes_size, 0);
+    int sumWeight = 0; // 累计加权
+    lowcost[start] = 0;
+    struct Compare
+    {
+        bool operator()(const pair<int, int>& a, const pair<int, int>& b)
+        {
+            return a.second > b.second;
+        }
+    };
+    priority_queue<pair<int, int>, vector<pair<int, int>>, Compare> que;
+
+    que.push({start, 0});
+    while (!que.empty())
+    {
+        pair<int, int> now_pair = que.top();
+        que.pop();
+        int now = now_pair.first;
+
+        if (S[now] == 1)
+        {
+            continue;
+        }
+        if (lowcost[now] == INF)
+        {
+            return sumWeight; // 结束
+        }
+
+        S[now] = 1;
+        sumWeight += lowcost[now];
+        if (now != start)
+        {
+            cout << pre[now] << "-" << now << "\n"; // 输出最小支撑树里的边
+        }
+        for (linknode &a : nodes[now].link)
+        {
+            if (S[a.index] == 0 && lowcost[a.index] > a.weight)
+            {
+                lowcost[a.index] = a.weight;
+                pre[a.index] = now;
+                que.push({a.index, a.weight});
+            }
+        }
+    }
+    return sumWeight;
+}
+```
 
 ### Kruskal算法(逐边加入)
 
